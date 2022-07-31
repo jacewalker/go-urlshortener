@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> {{ .title }} </title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900">
+    <div class="max-w-screen-xl px-4 py-16 mx-auto sm:px-6 lg:px-8 text-white">
+        <div class="max-w-lg mx-auto">
+            <h1 class="text-3xl font-bold text-center text-indigo-600 sm:text-3xl">inker.ink</h1>
+            <p class="text-sm font-bold text-center text-grey-400">url shortener</p>
+            <form class="p-4 mt-2 mb-0 space-y-4 rounded-lg shadow-2xl" action="/shorten" method="post">
+                <div>
+                    <div class="relative mt-1">
+                        <input type="text" name="url" placeholder="Enter a URL to shorten" autocomplete="off"
+                            autocorrect="off" autocapitalize="off" spellcheck="false"
+                            class="w-full p-4 pr-12 text-black text-center text-sm border-gray-200 rounded-lg shadow-sm"></input>
+                        <div class="absolute top-0 right-0 mt-3 mr-3">
+                            <button type="submit"
+                                class="bg-indigo-600 text-white p-2 rounded-lg shadow-sm">Shorten</button>
+                            <span class="absolute inset-y-0 inline-flex items-center right-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <input type="submit" value="Shorten"
+                    class="block w-full px-5 py-3 text-sm font-medium text-white bg-indigo-600 rounded-lg">
+            </form>
+            <p class="text-sm text-center text-gray-500">
+                Looking for an existing URL? <a href="/urls" class="underline">View all URLs</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
