@@ -81,7 +81,7 @@ func generateRandomString() string {
 }
 
 func saveToDatabase(newUrl ShortUrl) {
-	dsn := fmt.Sprintf("host=172.17.0.3 port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
+	dsn := fmt.Sprintf("host=database port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -102,7 +102,7 @@ func saveToDatabase(newUrl ShortUrl) {
 }
 
 func lookupFromDatabase(shortString string) string {
-	dsn := fmt.Sprintf("host=172.17.0.3 port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
+	dsn := fmt.Sprintf("host=database port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
