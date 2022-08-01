@@ -8,3 +8,7 @@ RUN go get "github.com/gin-gonic/gin"
 RUN go build -o main .
 EXPOSE 3004
 CMD ["/app/main"]
+
+
+# docker build -t go-urlshort:latest .
+# docker run -it -p 4003:8080 -d go-urlshort:latest go run main.go
