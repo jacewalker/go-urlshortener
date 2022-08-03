@@ -32,22 +32,27 @@ func main() {
 	router.POST("/shorten", func(c *gin.Context) {
 		webAddress := c.PostForm("url")
 		workingUrl := ShortUrl{ShortString: generateRandomString(), WebAddress: formatUrl(webAddress)}
-		saveToDatabase(workingUrl)
+		duplicateCatch, success := lookupWebAddressFromDatabase(workingUrl.WebAddress)
+
+		if success {
+			workingUrl = duplicateCatch
+		} else {
+			saveToDatabase(workingUrl)
+		}
 
 		c.HTML(http.StatusOK, "shorten.tmpl", gin.H{
 			"title":  "URL Shortener",
-			"shorty": fmt.Sprintf("https://inker.ink/" + workingUrl.ShortString),
+			"shorty": fmt.Sprintf("http://127.0.0.1:8080/" + workingUrl.ShortString),
 		})
 	})
 
 	router.GET("/:shortString", func(c *gin.Context) {
 		short := c.Param("shortString")
 		if short != "" {
-			lookupAddress := lookupFromDatabase(short)
-			log.Println("Look up address:", lookupAddress)
+			lookup, success := lookupShortStringFromDatabase(short)
 
-			if lookupAddress != "" {
-				c.Redirect(http.StatusTemporaryRedirect, lookupAddress)
+			if success {
+				c.Redirect(http.StatusTemporaryRedirect, lookup.WebAddress)
 			} else {
 				c.HTML(http.StatusOK, "index.tmpl", gin.H{
 					"title": "URL Shortener",
@@ -81,7 +86,7 @@ func generateRandomString() string {
 }
 
 func saveToDatabase(newUrl ShortUrl) {
-	dsn := fmt.Sprintf("host=database port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
+	dsn := fmt.Sprintf("host=172.17.0.3 port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -94,15 +99,16 @@ func saveToDatabase(newUrl ShortUrl) {
 	var existingUrl ShortUrl
 	db.Where("web_address = ?", newUrl.WebAddress).First(&existingUrl)
 	if existingUrl.ShortString != "" {
-		fmt.Println("Web address already exists in the database.")
+		fmt.Println(newUrl.WebAddress, "already exists in the database.")
 	} else {
 		db.Create(&ShortUrl{ShortString: newUrl.ShortString, WebAddress: newUrl.WebAddress})
+		log.Println("Saved:", newUrl.WebAddress, "to the database.")
 	}
 
 }
 
-func lookupFromDatabase(shortString string) string {
-	dsn := fmt.Sprintf("host=database port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
+func lookupShortStringFromDatabase(shortString string) (ShortUrl, bool) {
+	dsn := fmt.Sprintf("host=172.17.0.3 port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -112,5 +118,33 @@ func lookupFromDatabase(shortString string) string {
 	short := new(ShortUrl)
 	db.Where("short_string = ?", shortString).First(&short)
 
-	return short.WebAddress
+	log.Println("Retrieved Short Address:", short.ShortString)
+	log.Println("Retrieved Web Address:", short.WebAddress)
+
+	if short.WebAddress == "" {
+		return *short, false
+	} else {
+		return *short, true
+	}
+}
+
+func lookupWebAddressFromDatabase(webAddress string) (ShortUrl, bool) {
+	dsn := fmt.Sprintf("host=172.17.0.3 port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
+	if err != nil {
+		log.Fatal("Failed to connect to database.")
+	}
+
+	short := new(ShortUrl)
+	db.Where("web_address = ?", webAddress).First(&short)
+
+	log.Println("Retrieved Short Address:", short.ShortString)
+	log.Println("Retrieved Web Address:", short.WebAddress)
+
+	if short.WebAddress == "" {
+		return *short, false
+	} else {
+		return *short, true
+	}
 }
