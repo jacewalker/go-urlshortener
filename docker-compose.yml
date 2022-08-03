@@ -4,7 +4,6 @@ services:
   web_app:
     build: .
     container_name: go_urlshortener
-    hostname: go_urlshortener
     image: go-urlshort:latest
     restart: always
     ports:
@@ -19,7 +18,6 @@ services:
 
   database:
     container_name: go_urlshort_db
-    hostname: postgres
     image: postgres:latest
     restart: always
     environment:
