@@ -1,16 +1,20 @@
+Inker.ink is a fast web app designed for you to self-host your own URL shortening website on your custom domain.
+
+```
 version: "3.8"
 
 services:
   web_app:
-    container_name: inker
-    image: ralphydev/inker.ink:1.0
+    build: .
+    container_name: inker.ink
+    image: ralphydev/inker.ink:latest
     restart: always
     ports:
-      - "80:8080"
+      - "8080:8080"
     command: go run main.go
     environment:
-      - CUSTOM_DOMAIN=https://inker.ink/ # with trailing slash
-      - SITE_TITLE=inker.ink
+      - CUSTOM_DOMAIN="https://inker.ink"
+      - SITE_TITLE="inker.ink"
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=short_urls
@@ -22,7 +26,7 @@ services:
       - database
 
   database:
-    container_name: inker_db
+    container_name: go_urlshort_db
     image: postgres:latest
     restart: always
     environment:
@@ -40,3 +44,4 @@ volumes:
 networks:
   default:
       name: inker
+```

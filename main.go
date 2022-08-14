@@ -1,3 +1,8 @@
+// *****************************
+// Jace Walker © 2020
+// dev@jcwlkr.io
+// *****************************
+
 package main
 
 import (
@@ -6,12 +11,23 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	CUSTOM_DOMAIN     = os.Getenv("CUSTOM_DOMAIN")
+	SITE_TITLE        = os.Getenv("SITE_TITLE")
+	POSTGRES_USER     = os.Getenv("POSTGRES_USER")
+	POSTGRES_PASSWORD = os.Getenv("POSTGRES_PASSWORD")
+	POSTGRES_DB       = os.Getenv("POSTGRES_DB")
+	POSTGRES_HOST     = os.Getenv("POSTGRES_HOST")
+	POSTGRES_PORT     = os.Getenv("POSTGRES_PORT")
 )
 
 type ShortUrl struct {
@@ -25,7 +41,7 @@ func main() {
 
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"title": "URL Shortener",
+			"title": SITE_TITLE,
 		})
 	})
 
@@ -41,8 +57,8 @@ func main() {
 		}
 
 		c.HTML(http.StatusOK, "shorten.tmpl", gin.H{
-			"title":  "URL Shortener",
-			"shorty": fmt.Sprintf("http://inker.ink/" + workingUrl.ShortString),
+			"title":  SITE_TITLE,
+			"shorty": fmt.Sprintf(CUSTOM_DOMAIN + workingUrl.ShortString),
 		})
 	})
 
@@ -55,7 +71,7 @@ func main() {
 				c.Redirect(http.StatusTemporaryRedirect, lookup.WebAddress)
 			} else {
 				c.HTML(http.StatusOK, "index.tmpl", gin.H{
-					"title": "URL Shortener",
+					"title": SITE_TITLE,
 				})
 			}
 		}
@@ -86,7 +102,7 @@ func generateRandomString() string {
 }
 
 func saveToDatabase(newUrl ShortUrl) {
-	dsn := fmt.Sprintf("host=database port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
+	dsn := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable TimeZone=Australia/Melbourne", POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -108,7 +124,7 @@ func saveToDatabase(newUrl ShortUrl) {
 }
 
 func lookupShortStringFromDatabase(shortString string) (ShortUrl, bool) {
-	dsn := fmt.Sprintf("host=database port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
+	dsn := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable TimeZone=Australia/Melbourne", POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -129,7 +145,7 @@ func lookupShortStringFromDatabase(shortString string) (ShortUrl, bool) {
 }
 
 func lookupWebAddressFromDatabase(webAddress string) (ShortUrl, bool) {
-	dsn := fmt.Sprintf("host=database port=5432 dbname=short_urls user=postgres password=postgres sslmode=disable TimeZone=Australia/Melbourne")
+	dsn := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable TimeZone=Australia/Melbourne", POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
