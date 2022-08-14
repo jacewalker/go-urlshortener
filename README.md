@@ -1,7 +1,5 @@
 Inker.ink is a fast web app designed for you to self-host your own URL shortening website on your custom domain. Written in Go using Gin.
 
-Github: `https://github.com/jacewalker/inker.ink`
-
 ```
 Docker Compose example:
 
